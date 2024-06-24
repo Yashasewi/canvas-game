@@ -9,7 +9,7 @@ canvas.height = window.innerHeight;
 
 const x = canvas.width / 2;
 const y = canvas.height / 2;
-const player = new Player(x, y, 30, "blue");
+const player = new Player(x, y, 30, "blue", 5);
 
 const ShootPowers = [];
 const Enemies = [];
@@ -52,6 +52,8 @@ function animate() {
     ctx.fillStyle = "rgba(0,0,0,0.15)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     player.update();
+    // console.log("enamies", Enemies.length);
+    // console.log(ShootPowers.length);
 
     ShootPowers.forEach((power) => {
         power.update();
@@ -69,6 +71,16 @@ function animate() {
     // console.log(ShootPowers.length);
 
     Enemies.forEach((enemy, enemyIndex) => {
+        if (
+            enemy.x + enemy.radius < 0 ||
+            enemy.x - enemy.radius > canvas.width ||
+            enemy.y + enemy.radius < 0 ||
+            enemy.y - enemy.radius > canvas.height
+        ) {
+            setTimeout(() => {
+                Enemies.splice(enemyIndex, 1);
+            }, 0);
+        }
         const distanceBTPlayer = Math.hypot(
             enemy.x - player.x,
             enemy.y - player.y
@@ -107,6 +119,11 @@ window.addEventListener("keydown", (e) => {
         case "d":
             player.moveRight = true;
             break;
+        case " ":
+            console.log(gameIsPaused);
+            gameIsPaused ? resumeGame() : pauseGame();
+            console.log(animationId);
+            break;
     }
 });
 
@@ -141,7 +158,14 @@ function shoot(event) {
 }
 
 window.addEventListener("click", shoot);
-// window.addEventListener("visibilitychange", (event) => {
-//     console.log(event);
-// console.log(document.visibilityState);
-// });
+
+// TODO : add game menu
+function pauseGame() {
+    cancelAnimationFrame(animationId);
+    gameIsPaused = true;
+}
+
+function resumeGame() {
+    animationId = requestAnimationFrame(animate);
+    gameIsPaused = false;
+}
