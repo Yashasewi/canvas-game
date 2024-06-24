@@ -2,7 +2,7 @@ const canvas = document.getElementById("canvas");
 
 const ctx = canvas.getContext("2d");
 export class Player {
-    constructor(x, y, radius, color) {
+    constructor(x, y, radius, color , speed) {
         this.x = x;
         this.y = y;
         this.radius = radius;
@@ -11,7 +11,7 @@ export class Player {
         this.moveDown = false;
         this.moveLeft = false;
         this.moveRight = false;
-        this.speed = 5; // Adjust as needed
+        this.speed = speed; // Adjust as needed
     }
     draw() {
         ctx.beginPath();
