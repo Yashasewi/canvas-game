@@ -1,70 +1,11 @@
 import "../style.css";
+import { Player, Enemy, ShootPower } from "./Characters";
 
 const canvas = document.getElementById("canvas");
-
 const ctx = canvas.getContext("2d");
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-
-class Player {
-    constructor(x, y, radius, color) {
-        this.x = x;
-        this.y = y;
-        this.radius = radius;
-        this.color = color;
-    }
-    draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-    }
-}
-
-class ShootPower {
-    constructor(x, y, radius, color, velocity) {
-        this.x = x;
-        this.y = y;
-        this.radius = radius;
-        this.color = color;
-        this.velocity = velocity;
-    }
-    draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-    }
-    update() {
-        this.draw();
-        this.x += this.velocity.x;
-        this.y += this.velocity.y;
-    }
-}
-
-class Enemy {
-    constructor(x, y, radius, color, velocity) {
-        this.x = x;
-        this.y = y;
-        this.radius = radius;
-        this.color = color;
-        this.velocity = velocity;
-    }
-
-    draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-    }
-
-    update() {
-        this.draw();
-        this.x += this.velocity.x;
-        this.y += this.velocity.y;
-    }
-}
 
 const x = canvas.width / 2;
 const y = canvas.height / 2;
@@ -73,34 +14,44 @@ const player = new Player(x, y, 30, "blue");
 const ShootPowers = [];
 const Enemies = [];
 
+let gameIsPaused = false;
+
+document.addEventListener("visibilitychange", () => {
+    gameIsPaused = document.hidden;
+});
+
 function SpawnEnemies() {
     let x;
     let y;
     setInterval(() => {
-        const radius = Math.random() * 30 + 10;
-        if (Math.random() < 0.5) {
-            x = Math.random() < 0.5 ? 0 - radius : canvas.width + radius;
-            y = Math.random() * canvas.height;
-        } else {
-            x = Math.random() * canvas.width;
-            y = Math.random() < 0.5 ? 0 - radius : canvas.height + radius;
-        }
+        if (!gameIsPaused) {
+            const radius = Math.random() * 30 + 10;
+            // const radius = Math.random() * 3 + 1;
+            if (Math.random() < 0.5) {
+                x = Math.random() < 0.5 ? 0 - radius : canvas.width + radius;
+                y = Math.random() * canvas.height;
+            } else {
+                x = Math.random() * canvas.width;
+                y = Math.random() < 0.5 ? 0 - radius : canvas.height + radius;
+            }
 
-        const angle = Math.atan2(canvas.height / 2 - y, canvas.width / 2 - x);
-        const velocity = {
-            x: Math.cos(angle),
-            y: Math.sin(angle),
-        };
-        Enemies.push(new Enemy(x, y, radius, "green", velocity));
+            // const angle = Math.atan2(canvas.height / 2 - y, canvas.width / 2 - x);
+            const angle = Math.atan2(player.y - y, player.x - x);
+            const velocity = {
+                x: Math.cos(angle),
+                y: Math.sin(angle),
+            };
+            Enemies.push(new Enemy(x, y, radius, "green", velocity));
+        }
     }, 1000);
 }
 
 let animationId;
 function animate() {
     animationId = requestAnimationFrame(animate);
-    ctx.fillStyle = "rgba(0,0,0,0.1)";
+    ctx.fillStyle = "rgba(0,0,0,0.15)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    player.draw();
+    player.update();
 
     ShootPowers.forEach((power) => {
         power.update();
@@ -139,50 +90,58 @@ function animate() {
     });
 }
 
-window.addEventListener("click", (event) => {
-    const angle = Math.atan2(
-        event.clientY - canvas.height / 2,
-        event.clientX - canvas.width / 2
-    );
-    const velocity = {
-        x: Math.cos(angle),
-        y: Math.sin(angle),
-    };
-    ShootPowers.push(
-        // new ShootPower(canvas.width / 2, canvas.height / 2, 5, "red", velocity)
-        new ShootPower(player.x, player.y, 5, "red", velocity)
-    );
-});
+animate();
+SpawnEnemies();
 
 window.addEventListener("keydown", (e) => {
-    // console.log(e.key);
-    const key = e.key;
-    switch (key) {
+    switch (e.key) {
         case "w":
-            console.log("pressed w");
-            console.log(player.x, player.y);
-            player.y -= 5;
+            player.moveUp = true;
             break;
         case "s":
-            console.log("pressed s");
-            // console.log(player.x, player.y);
-            player.y += 5;
+            player.moveDown = true;
             break;
         case "a":
-            console.log("pressed a");
-            // console.log(player.x, player.y);
-            player.x -= 5;
+            player.moveLeft = true;
             break;
         case "d":
-            console.log("pressed a");
-            // console.log(player.x, player.y);
-            player.x += 5;
-            break;
-        default:
-            console.log("pressed " + key);
+            player.moveRight = true;
             break;
     }
 });
 
-animate();
-// SpawnEnemies();
+window.addEventListener("keyup", (e) => {
+    switch (e.key) {
+        case "w":
+            player.moveUp = false;
+            break;
+        case "s":
+            player.moveDown = false;
+            break;
+        case "a":
+            player.moveLeft = false;
+            break;
+        case "d":
+            player.moveRight = false;
+            break;
+    }
+});
+
+function shoot(event) {
+    // console.log("Shoot:", event.clientX, event.clientY);
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const angle = Math.atan2(y - player.y, x - player.x);
+    const velocity = {
+        x: Math.cos(angle) * 5,
+        y: Math.sin(angle) * 5,
+    };
+    ShootPowers.push(new ShootPower(player.x, player.y, 5, "red", velocity));
+}
+
+window.addEventListener("click", shoot);
+// window.addEventListener("visibilitychange", (event) => {
+//     console.log(event);
+// console.log(document.visibilityState);
+// });
