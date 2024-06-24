@@ -1,11 +1,17 @@
 import "../style.css";
-import { Player, Enemy, ShootPower } from "./Characters";
 
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+import { canvas, ctx } from "./utils/canvas.js";
+import { Player } from "./classes/Player.js";
+import { Projectile } from "./classes/Projectile.js";
+import { Enemy } from "./classes/Enemy.js";
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+
+window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
 
 const x = canvas.width / 2;
 const y = canvas.height / 2;
@@ -19,6 +25,9 @@ let gameIsPaused = false;
 document.addEventListener("visibilitychange", () => {
     gameIsPaused = document.hidden;
 });
+
+window.addEventListener("blur", pauseGame);
+window.addEventListener("focus", resumeGame);
 
 function SpawnEnemies() {
     let x;
@@ -154,7 +163,7 @@ function shoot(event) {
         x: Math.cos(angle) * 5,
         y: Math.sin(angle) * 5,
     };
-    ShootPowers.push(new ShootPower(player.x, player.y, 5, "red", velocity));
+    ShootPowers.push(new Projectile(player.x, player.y, 5, "red", velocity));
 }
 
 window.addEventListener("click", shoot);
