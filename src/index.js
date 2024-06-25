@@ -80,6 +80,11 @@ function animate() {
     // console.log(ShootPowers.length);
 
     Enemies.forEach((enemy, enemyIndex) => {
+        ctx.strokeStyle = "orange";
+        ctx.beginPath();
+        ctx.moveTo(player.x, player.y);
+        ctx.lineTo(enemy.x, enemy.y);
+        ctx.stroke();
         if (
             enemy.x + enemy.radius < 0 ||
             enemy.x - enemy.radius > canvas.width ||
@@ -97,7 +102,13 @@ function animate() {
         if (distanceBTPlayer - enemy.radius - player.radius < 1) {
             cancelAnimationFrame(animationId);
         }
+        const angle = Math.atan2(player.y - enemy.y, player.x - enemy.x);
+        const velocity = {
+            x: Math.cos(angle),
+            y: Math.sin(angle),
+        };
 
+        enemy.ChangeVelocity(velocity);
         enemy.update();
         ShootPowers.forEach((power, powerIndex) => {
             const distance = Math.hypot(enemy.x - power.x, enemy.y - power.y);
@@ -170,11 +181,15 @@ window.addEventListener("click", shoot);
 
 // TODO : add game menu
 function pauseGame() {
-    cancelAnimationFrame(animationId);
-    gameIsPaused = true;
+    if (gameIsPaused === false) {
+        cancelAnimationFrame(animationId);
+        gameIsPaused = true;
+    }
 }
 
 function resumeGame() {
-    animationId = requestAnimationFrame(animate);
-    gameIsPaused = false;
+    if (gameIsPaused) {
+        animationId = requestAnimationFrame(animate);
+        gameIsPaused = false;
+    }
 }
