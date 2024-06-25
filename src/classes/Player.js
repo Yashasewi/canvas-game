@@ -1,4 +1,4 @@
-import { ctx } from "../utils/canvas.js";
+import { ctx, canvas } from "../utils/canvas.js";
 
 export class Player {
     constructor(x, y, radius, color, speed) {

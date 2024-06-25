@@ -16,6 +16,10 @@ export class Enemy {
         ctx.fill();
     }
 
+    ChangeVelocity(velocity) {
+        this.velocity = velocity;
+    }
+
     update() {
         this.draw();
         this.x += this.velocity.x;
