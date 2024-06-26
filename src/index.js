@@ -15,7 +15,7 @@ window.addEventListener("resize", () => {
 
 const x = canvas.width / 2;
 const y = canvas.height / 2;
-const player = new Player(x, y, 30, "blue", 5);
+const player = new Player(x, y, 30, "blue", 6);
 
 const ShootPowers = [];
 const Enemies = [];
@@ -50,9 +50,15 @@ function SpawnEnemies() {
                 x: Math.cos(angle),
                 y: Math.sin(angle),
             };
-            Enemies.push(new Enemy(x, y, radius, "green", velocity));
+            const randomSpeed = {
+                x: Math.random() * 2 + 0.8,
+                y: Math.random() * 2 + 0.8,
+            };
+            Enemies.push(
+                new Enemy(x, y, radius, "green", velocity, randomSpeed)
+            );
         }
-    }, 1000);
+    }, 1500);
 }
 
 let animationId;
@@ -80,11 +86,11 @@ function animate() {
     // console.log(ShootPowers.length);
 
     Enemies.forEach((enemy, enemyIndex) => {
-        ctx.strokeStyle = "orange";
-        ctx.beginPath();
-        ctx.moveTo(player.x, player.y);
-        ctx.lineTo(enemy.x, enemy.y);
-        ctx.stroke();
+        // ctx.strokeStyle = "orange";
+        // ctx.beginPath();
+        // ctx.moveTo(player.x, player.y);
+        // ctx.lineTo(enemy.x, enemy.y);
+        // ctx.stroke();
         if (
             enemy.x + enemy.radius < 0 ||
             enemy.x - enemy.radius > canvas.width ||
