@@ -1,12 +1,13 @@
 import { ctx } from "../utils/canvas.js";
 
 export class Enemy {
-    constructor(x, y, radius, color, velocity) {
+    constructor(x, y, radius, color, velocity, randomSpeed) {
         this.x = x;
         this.y = y;
         this.radius = radius;
         this.color = color;
         this.velocity = velocity;
+        this.randomSpeed = randomSpeed;
     }
 
     draw() {
@@ -17,7 +18,10 @@ export class Enemy {
     }
 
     ChangeVelocity(velocity) {
-        this.velocity = velocity;
+        this.velocity = {
+            x: velocity.x * this.randomSpeed.x,
+            y: velocity.y * this.randomSpeed.y,
+        };
     }
 
     update() {
