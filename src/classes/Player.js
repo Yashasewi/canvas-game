@@ -19,19 +19,19 @@ export class Player {
         ctx.fill();
     }
     update() {
-        if (this.moveUp) {
+        if (this.moveUp && this.y >= this.radius + 5) {
             this.y -= this.speed;
             console.log("Moving up", this.y);
         }
-        if (this.moveDown) {
+        if (this.moveDown && this.y <= canvas.height - this.radius - 5) {
             this.y += this.speed;
             console.log("Moving down", this.y);
         }
-        if (this.moveLeft) {
+        if (this.moveLeft && this.x >= this.radius + 5) {
             this.x -= this.speed;
             console.log("Moving left", this.x);
         }
-        if (this.moveRight) {
+        if (this.moveRight && this.x <= canvas.width - this.radius - 5) {
             this.x += this.speed;
             console.log("Moving right", this.x);
         }
