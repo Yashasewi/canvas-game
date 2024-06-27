@@ -4,6 +4,7 @@ import { canvas, ctx } from "./utils/canvas.js";
 import { Player } from "./classes/Player.js";
 import { Projectile } from "./classes/Projectile.js";
 import { Enemy } from "./classes/Enemy.js";
+import { Particle } from "./classes/Particle.js";
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
@@ -19,6 +20,7 @@ const player = new Player(x, y, 30, "blue", 6);
 
 const ShootPowers = [];
 const Enemies = [];
+const ParticlesArr = [];
 
 let gameIsPaused = false;
 
@@ -122,9 +124,20 @@ function animate() {
                 setTimeout(() => {
                     Enemies.splice(enemyIndex, 1);
                     ShootPowers.splice(powerIndex, 1);
+                    SpawnParticles(power.x, power.y, enemy.radius);
                 }, 0);
             }
         });
+    });
+
+    ParticlesArr.forEach((p, index) => {
+        const distance = Math.hypot(p.oldX - p.x, p.oldY - p.y);
+        if (distance > 200)
+            setTimeout(() => {
+                ParticlesArr.splice(index, 1);
+            }, 0);
+        p.Update();
+        
     });
 }
 
@@ -184,6 +197,34 @@ function shoot(event) {
 }
 
 window.addEventListener("click", shoot);
+function SpawnParticles(x, y, r) {
+    console.log(ParticlesArr.length);
+    ParticlesArr.splice(0, ParticlesArr.length);
+    for (let i = 0; i <= 4 * (r / 2); i++) {
+        const velocity = {
+            x:
+                Math.ceil(Math.random() * 5) *
+                (Math.round(Math.random()) ? 1 : -1),
+            y:
+                Math.ceil(Math.random() * 5) *
+                (Math.round(Math.random()) ? 1 : -1),
+        };
+        ParticlesArr.push(
+            new Particle(
+                x +
+                    Math.ceil(Math.random() * r) *
+                        (Math.round(Math.random()) ? 1 : -1),
+                y +
+                    Math.ceil(Math.random() * r) *
+                        (Math.round(Math.random()) ? 1 : -1),
+                Math.random() * 8,
+                velocity
+            )
+        );
+    }
+}
+
+// window.addEventListener("click", SpawnParticles);
 
 // TODO : add game menu
 function pauseGame() {
