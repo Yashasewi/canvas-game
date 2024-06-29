@@ -10,7 +10,7 @@ export class Player {
         this.moveDown = false;
         this.moveLeft = false;
         this.moveRight = false;
-        this.speed = speed; // Adjust as needed
+        this.speed = speed;
     }
     draw() {
         ctx.beginPath();
