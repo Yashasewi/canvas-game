@@ -6,6 +6,12 @@ import { Projectile } from "./classes/Projectile.js";
 import { Enemy } from "./classes/Enemy.js";
 import { Particle } from "./classes/Particle.js";
 
+// TODO
+// [ ] increase player speed thing
+// [ ] add game menu
+// [ ] add high score thing
+// [ ] add restart game thing
+
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
@@ -246,9 +252,7 @@ function SpawnParticles(x, y, r) {
     }
 }
 
-// window.addEventListener("click", SpawnParticles);
 
-// TODO : add game menu
 function pauseGame() {
     if (gameIsPaused === false) {
         cancelAnimationFrame(animationId);

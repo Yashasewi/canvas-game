@@ -1,6 +1,5 @@
 import { Particle } from "../classes/Particle";
 export function SpawnParticles(x, y) {
-    // particles = [];
     const angle = Math.atan2(y, x);
     const velocity = {
         x: Math.cos(angle),
