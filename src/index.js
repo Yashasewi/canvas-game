@@ -14,6 +14,9 @@ window.addEventListener("resize", () => {
     canvas.height = window.innerHeight;
 });
 
+const score = document.getElementsByClassName("score-count")[0];
+const time = document.getElementsByClassName("time-count")[0];
+
 const x = canvas.width / 2;
 const y = canvas.height / 2;
 const player = new Player(x, y, 30, "blue", 6);
@@ -22,7 +25,26 @@ const ShootPowers = [];
 const Enemies = [];
 const ParticlesArr = [];
 
+let scoreCount = 0;
 let gameIsPaused = false;
+let timeSpent = 0;
+let enemiesSpeed = 2;
+
+let intervalId = createInterval();
+function createInterval() {
+    return setInterval(() => {
+        timeSpent = timeSpent + 1;
+        time.innerHTML = " " + timeSpent;
+        if (timeSpent % 10 == 0) {
+            enemiesSpeed = enemiesSpeed + 1;
+        }
+    }, 1000);
+}
+
+function ChangeScore() {
+    scoreCount = scoreCount + 1;
+    score.innerHTML = " " + scoreCount;
+}
 
 document.addEventListener("visibilitychange", () => {
     gameIsPaused = document.hidden;
@@ -53,8 +75,8 @@ function SpawnEnemies() {
                 y: Math.sin(angle),
             };
             const randomSpeed = {
-                x: Math.random() * 2 + 0.8,
-                y: Math.random() * 2 + 0.8,
+                x: Math.random() * enemiesSpeed + 1,
+                y: Math.random() * enemiesSpeed + 1,
             };
             Enemies.push(
                 new Enemy(x, y, radius, "green", velocity, randomSpeed)
@@ -109,6 +131,7 @@ function animate() {
         );
         if (distanceBTPlayer - enemy.radius - player.radius < 1) {
             cancelAnimationFrame(animationId);
+            clearInterval(intervalId);
         }
         const angle = Math.atan2(player.y - enemy.y, player.x - enemy.x);
         const velocity = {
@@ -124,6 +147,7 @@ function animate() {
                 setTimeout(() => {
                     Enemies.splice(enemyIndex, 1);
                     ShootPowers.splice(powerIndex, 1);
+                    ChangeScore();
                     SpawnParticles(power.x, power.y, enemy.radius);
                 }, 0);
             }
@@ -137,7 +161,6 @@ function animate() {
                 ParticlesArr.splice(index, 1);
             }, 0);
         p.Update();
-        
     });
 }
 
@@ -198,7 +221,6 @@ function shoot(event) {
 
 window.addEventListener("click", shoot);
 function SpawnParticles(x, y, r) {
-    console.log(ParticlesArr.length);
     ParticlesArr.splice(0, ParticlesArr.length);
     for (let i = 0; i <= 4 * (r / 2); i++) {
         const velocity = {
@@ -212,10 +234,10 @@ function SpawnParticles(x, y, r) {
         ParticlesArr.push(
             new Particle(
                 x +
-                    Math.ceil(Math.random() * r) *
+                    Math.ceil(Math.random() * (r / 4)) *
                         (Math.round(Math.random()) ? 1 : -1),
                 y +
-                    Math.ceil(Math.random() * r) *
+                    Math.ceil(Math.random() * (r / 4)) *
                         (Math.round(Math.random()) ? 1 : -1),
                 Math.random() * 8,
                 velocity
@@ -231,6 +253,7 @@ function pauseGame() {
     if (gameIsPaused === false) {
         cancelAnimationFrame(animationId);
         gameIsPaused = true;
+        clearInterval(intervalId);
     }
 }
 
@@ -238,5 +261,6 @@ function resumeGame() {
     if (gameIsPaused) {
         animationId = requestAnimationFrame(animate);
         gameIsPaused = false;
+        intervalId = createInterval();
     }
 }

@@ -13,3 +13,18 @@ body {
 canvas {
     background: black;
 }
+
+.flex {
+    display: flex;
+    /* flex-direction: column; */
+    position: absolute;
+    gap: 1rem;
+    top: 2%;
+    right: 2%;
+    font-size: 2.5rem;
+    user-select: none;
+    #score,
+    #timer {
+        color: whitesmoke;
+    }
+}
