@@ -1,0 +1,9 @@
+export const PLAYER_RADIUS = 30;
+export const PLAYER_SPEED = 6;
+export const PROJECTILE_RADIUS = 6;
+export const PROJECTILE_SPEED = 7;
+export const ENEMY_SPAWN_INTERVAL = 1500;
+export const SCORE_INCREMENT = 1;
+export const TIME_INCREMENT = 1;
+export const ENEMY_SPEED_INCREMENT_INTERVAL = 10;
+export const ENEMY_SPEED_INCREMENT = 1;
