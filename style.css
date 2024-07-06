@@ -28,3 +28,22 @@ canvas {
         color: whitesmoke;
     }
 }
+
+.menu {
+    background-color: rebeccapurple;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    gap: 1rem;
+    top: 40%;
+    right: 45%;
+    text-align: center;
+    /* align-items: center; */
+    /* justify-content: right; */
+    font-size: 2.5rem;
+    user-select: none;
+    color: white;
+    .restart-menu {
+        display: none;
+    }
+}

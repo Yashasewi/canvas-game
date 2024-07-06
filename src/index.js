@@ -6,15 +6,17 @@ import { Projectile } from "./classes/Projectile.js";
 import { Enemy } from "./classes/Enemy.js";
 import { Particle } from "./classes/Particle.js";
 
-const PLAYER_RADIUS = 30;
-const PLAYER_SPEED = 6;
-const PROJECTILE_RADIUS = 5;
-const PROJECTILE_SPEED = 5;
-const ENEMY_SPAWN_INTERVAL = 1500;
-const SCORE_INCREMENT = 1;
-const TIME_INCREMENT = 1;
-const ENEMY_SPEED_INCREMENT_INTERVAL = 10;
-const ENEMY_SPEED_INCREMENT = 1;
+import {
+    PLAYER_RADIUS,
+    PLAYER_SPEED,
+    PROJECTILE_RADIUS,
+    PROJECTILE_SPEED,
+    ENEMY_SPAWN_INTERVAL,
+    SCORE_INCREMENT,
+    TIME_INCREMENT,
+    ENEMY_SPEED_INCREMENT_INTERVAL,
+    ENEMY_SPEED_INCREMENT,
+} from "./utils/constant.js";
 
 // TODO:
 // [ ] Implement a simple start menu
@@ -55,34 +57,35 @@ const x = canvas.width / 2;
 const y = canvas.height / 2;
 const player = new Player(x, y, PLAYER_RADIUS, "blue", PLAYER_SPEED);
 
+const gameState = {
+    score: 0,
+    time: 0,
+    enemySpeed: 2,
+    isPaused: false,
+    intervalId: undefined,
+    animationId: undefined,
+};
+
 const ShootPowers = [];
 const Enemies = [];
 const ParticlesArr = [];
 
-let scoreCount = 0;
-let gameIsPaused = false;
-let timeSpent = 0;
-let enemiesSpeed = 2;
+gameState.intervalId = createInterval();
 
-let intervalId = createInterval();
 function createInterval() {
     return setInterval(() => {
-        timeSpent = timeSpent + TIME_INCREMENT;
-        time.innerHTML = " " + timeSpent;
-        if (timeSpent % ENEMY_SPEED_INCREMENT_INTERVAL == 0) {
-            enemiesSpeed = enemiesSpeed + ENEMY_SPEED_INCREMENT;
+        gameState.time = gameState.time + TIME_INCREMENT;
+        time.innerHTML = " " + gameState.time;
+        if (gameState.time % ENEMY_SPEED_INCREMENT_INTERVAL == 0) {
+            gameState.enemySpeed = gameState.enemySpeed + ENEMY_SPEED_INCREMENT;
         }
     }, 1000);
 }
 
 function ChangeScore() {
-    scoreCount = scoreCount + SCORE_INCREMENT;
-    score.innerHTML = " " + scoreCount;
+    gameState.score = gameState.score + SCORE_INCREMENT;
+    score.innerHTML = " " + gameState.score;
 }
-
-// document.addEventListener("visibilitychange", () => {
-//     gameIsPaused = document.hidden;
-// });
 
 window.addEventListener("blur", pauseGame);
 window.addEventListener("focus", resumeGame);
@@ -91,7 +94,7 @@ function SpawnEnemies() {
     let x;
     let y;
     setInterval(() => {
-        if (!gameIsPaused) {
+        if (!gameState.isPaused) {
             const radius = Math.random() * 30 + 10;
             // const radius = Math.random() * 3 + 1;
             if (Math.random() < 0.5) {
@@ -109,8 +112,8 @@ function SpawnEnemies() {
                 y: Math.sin(angle),
             };
             const randomSpeed = {
-                x: Math.random() * enemiesSpeed + 1,
-                y: Math.random() * enemiesSpeed + 1,
+                x: Math.random() * gameState.enemySpeed + 1,
+                y: Math.random() * gameState.enemySpeed + 1,
             };
             Enemies.push(
                 new Enemy(x, y, radius, "green", velocity, randomSpeed)
@@ -119,9 +122,8 @@ function SpawnEnemies() {
     }, ENEMY_SPAWN_INTERVAL);
 }
 
-let animationId;
 function animate() {
-    animationId = requestAnimationFrame(animate);
+    gameState.animationId = requestAnimationFrame(animate);
     ctx.fillStyle = "rgba(0,0,0,0.15)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     player.update();
@@ -164,8 +166,8 @@ function animate() {
             enemy.y - player.y
         );
         if (distanceBTPlayer - enemy.radius - player.radius < 1) {
-            cancelAnimationFrame(animationId);
-            clearInterval(intervalId);
+            cancelAnimationFrame(gameState.animationId);
+            clearInterval(gameState.intervalId);
         }
         const angle = Math.atan2(player.y - enemy.y, player.x - enemy.x);
         const velocity = {
@@ -198,8 +200,10 @@ function animate() {
     });
 }
 
-animate();
-SpawnEnemies();
+function InitGame() {
+    animate();
+    SpawnEnemies();
+}
 
 window.addEventListener("keydown", (e) => {
     switch (e.key) {
@@ -216,9 +220,9 @@ window.addEventListener("keydown", (e) => {
             player.moveRight = true;
             break;
         case " ":
-            console.log(gameIsPaused);
-            gameIsPaused ? resumeGame() : pauseGame();
-            console.log(animationId);
+            console.log(gameState.isPaused);
+            gameState.isPaused ? resumeGame() : pauseGame();
+            console.log(gameState.animationId);
             break;
     }
 });
@@ -283,17 +287,19 @@ function SpawnParticles(x, y, r) {
 }
 
 function pauseGame() {
-    if (gameIsPaused === false) {
-        cancelAnimationFrame(animationId);
-        gameIsPaused = true;
-        clearInterval(intervalId);
+    if (gameState.isPaused === false) {
+        cancelAnimationFrame(gameState.animationId);
+        gameState.isPaused = true;
+        clearInterval(gameState.intervalId);
     }
 }
 
 function resumeGame() {
-    if (gameIsPaused) {
-        animationId = requestAnimationFrame(animate);
-        gameIsPaused = false;
-        intervalId = createInterval();
+    if (gameState.isPaused) {
+        gameState.animationId = requestAnimationFrame(animate);
+        gameState.isPaused = false;
+        gameState.intervalId = createInterval();
     }
 }
+
+// InitGame();
