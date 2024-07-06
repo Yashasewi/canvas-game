@@ -6,11 +6,39 @@ import { Projectile } from "./classes/Projectile.js";
 import { Enemy } from "./classes/Enemy.js";
 import { Particle } from "./classes/Particle.js";
 
-// TODO
-// [ ] increase player speed thing
-// [ ] add game menu
-// [ ] add high score thing
-// [ ] add restart game thing
+const PLAYER_RADIUS = 30;
+const PLAYER_SPEED = 6;
+const PROJECTILE_RADIUS = 5;
+const PROJECTILE_SPEED = 5;
+const ENEMY_SPAWN_INTERVAL = 1500;
+const SCORE_INCREMENT = 1;
+const TIME_INCREMENT = 1;
+const ENEMY_SPEED_INCREMENT_INTERVAL = 10;
+const ENEMY_SPEED_INCREMENT = 1;
+
+// TODO:
+// [ ] Implement a simple start menu
+// [ ] Add a pause menu with resume and restart options
+// [ ] Improve player movement (smoother acceleration/deceleration)
+
+// [ ] Create a simple tutorial or instructions screen
+
+// [ ] Add difficulty levels (easy, medium, hard)
+// [ ] Create different types of enemies (varying sizes, speeds, or behaviors)
+// [ ] Add simple power-ups (e.g., temporary speed boost, shield)
+// [ ] Implement a basic high score system (stored locally)
+// [ ] Implement power-ups (e.g., temporary invincibility, rapid fire, area blast)
+// [ ] Add boss battles every X waves or time interval
+// [ ] Implement a wave system instead of continuous spawning
+// [ ] Add sound effects for shooting and enemy destruction
+// [ ] Add visual polish (background, particle effects)
+// // [ ] Create a settings menu (volume control, graphics options)
+// [ ] Implement local multiplayer (split-screen or shared screen)
+// [ ] Add player lives system
+// [ ] Add screen shake and other visual effects for more impact
+// [ ] Create an endless mode with increasing difficulty
+// [ ] Implement a combo system for chaining enemy defeats
+// [ ] Add a game over screen with final score display
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
@@ -25,7 +53,7 @@ const time = document.getElementsByClassName("time-count")[0];
 
 const x = canvas.width / 2;
 const y = canvas.height / 2;
-const player = new Player(x, y, 30, "blue", 6);
+const player = new Player(x, y, PLAYER_RADIUS, "blue", PLAYER_SPEED);
 
 const ShootPowers = [];
 const Enemies = [];
@@ -39,22 +67,22 @@ let enemiesSpeed = 2;
 let intervalId = createInterval();
 function createInterval() {
     return setInterval(() => {
-        timeSpent = timeSpent + 1;
+        timeSpent = timeSpent + TIME_INCREMENT;
         time.innerHTML = " " + timeSpent;
-        if (timeSpent % 10 == 0) {
-            enemiesSpeed = enemiesSpeed + 1;
+        if (timeSpent % ENEMY_SPEED_INCREMENT_INTERVAL == 0) {
+            enemiesSpeed = enemiesSpeed + ENEMY_SPEED_INCREMENT;
         }
     }, 1000);
 }
 
 function ChangeScore() {
-    scoreCount = scoreCount + 1;
+    scoreCount = scoreCount + SCORE_INCREMENT;
     score.innerHTML = " " + scoreCount;
 }
 
-document.addEventListener("visibilitychange", () => {
-    gameIsPaused = document.hidden;
-});
+// document.addEventListener("visibilitychange", () => {
+//     gameIsPaused = document.hidden;
+// });
 
 window.addEventListener("blur", pauseGame);
 window.addEventListener("focus", resumeGame);
@@ -88,7 +116,7 @@ function SpawnEnemies() {
                 new Enemy(x, y, radius, "green", velocity, randomSpeed)
             );
         }
-    }, 1500);
+    }, ENEMY_SPAWN_INTERVAL);
 }
 
 let animationId;
@@ -219,10 +247,12 @@ function shoot(event) {
     const y = event.clientY - rect.top;
     const angle = Math.atan2(y - player.y, x - player.x);
     const velocity = {
-        x: Math.cos(angle) * 5,
-        y: Math.sin(angle) * 5,
+        x: Math.cos(angle) * PROJECTILE_SPEED,
+        y: Math.sin(angle) * PROJECTILE_SPEED,
     };
-    ShootPowers.push(new Projectile(player.x, player.y, 5, "red", velocity));
+    ShootPowers.push(
+        new Projectile(player.x, player.y, PROJECTILE_RADIUS, "red", velocity)
+    );
 }
 
 window.addEventListener("click", shoot);
@@ -251,7 +281,6 @@ function SpawnParticles(x, y, r) {
         );
     }
 }
-
 
 function pauseGame() {
     if (gameIsPaused === false) {
